@@ -7,12 +7,30 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 
 class GameView(context: Context, attributes: AttributeSet): SurfaceView (context, attributes), SurfaceHolder.Callback {
+    private val thread: GameThread
+
+    init {
+        holder.addCallback(this)
+        thread = GameThread(holder, this)
+    }
+
     override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
-        TODO("Not yet implemented")
+        thread.setRunning(true)
+        thread.start()
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder?) {
-        TODO("Not yet implemented")
+        var retry = true
+        while(retry){
+            try {
+                thread.setRunning(false)
+                thread.join()
+            }catch (e:Exception){
+                e.printStackTrace()
+            }
+
+            retry = false
+        }
     }
 
     override fun surfaceCreated(holder: SurfaceHolder?) {
